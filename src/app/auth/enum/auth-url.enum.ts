@@ -1,6 +1,10 @@
 export enum AuthUrlEnum {
+    login          = "/user/login",
+    changePassword = "/user/change-password",
+    checkToken     = "/user/check-token",
+    suggestUser    = "/user/suggest",
+    role           = "/user/role",
+    dni            = "/user/dni",
     dashboard      = "/dashboard",
-    login          = "/auth/login",
-    changePassword = "/auth/change-password",
-    checkToken     = "/auth/check-token",
+    user           = "/user",
 }
