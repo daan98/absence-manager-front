@@ -4,6 +4,7 @@ import { Observable, catchError, map, retry, throwError, of, Subscription } from
 import { CheckTokenInterface, LoginResponseInterface, UserInterface } from '../interfaces';
 import { environment } from '../../../environments/environments';
 import { AuthStatusEnum, AuthUrlEnum, LocalStorageItemEnum } from '../enum';
+import { LocalStorageService } from '../../local-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,13 +13,17 @@ export class AuthService {
 
   private readonly baseUrl : string = environment.baseUrl;
   private http                      = inject(HttpClient);
+  private localStorageService      = inject( LocalStorageService );
 
   private _currentUser              = signal<UserInterface | null>(null);
   private _authStatus               = signal<AuthStatusEnum>(AuthStatusEnum.checking);
 
   public currentUser                = computed(() => this._currentUser());
   public authStatus                 = computed(() => this._authStatus());
-  constructor() { }
+  
+  constructor() { 
+    this.checkAuthStatus().subscribe();
+  }
 
   private setAuthentication(user : UserInterface, token : string) : boolean {
     this._currentUser.set(user);
@@ -44,7 +49,7 @@ export class AuthService {
 
     if(!token)  {
       throwError(() => 'Token no encontrado. Por favor inicia sesión con una cuenta valida');
-      // LLAMAR A LOGOUT
+      this.logout()
       return of(false);
     }
 

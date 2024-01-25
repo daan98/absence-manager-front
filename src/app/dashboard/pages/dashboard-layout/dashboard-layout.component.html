@@ -1,1 +1,42 @@
-<p>dashboard-layout works!</p>
+<mat-sidenav-container fullscreen>
+    <mat-sidenav #sidenav mode="push" [ngStyle]="{ width: '250px' }">
+        <mat-toolbar color="primary">
+            <span class="m-2">Menu</span>
+            <span class="spacer"></span>
+
+            <button mat-icon-button (click)="sidenav.toggle()">
+                <mat-icon fontIcon="close"></mat-icon>
+            </button>
+        </mat-toolbar>
+
+        <mat-nav-list>
+            <mat-list-item
+                *ngFor="let item of toolbarItems"
+                [routerLink]="item.url"
+                (click)="sidenav.toggle()"
+            >
+                <mat-icon matListItemIcon [fontIcon]="item.icon"></mat-icon>
+                {{ item.label }}
+            </mat-list-item>
+        </mat-nav-list>
+        
+    </mat-sidenav>
+
+    <mat-toolbar color="primary">
+        <button mat-icon-button (click)="sidenav.toggle()">
+            <mat-icon fontIcon="menu"></mat-icon>
+        </button>
+
+        <span class="spacer"></span>
+
+        <p class="m-0 text-primary">Bienvenido {{ this.authUser()?.name  }}</p>
+
+        <button mat-icon-button title="Cerrar sesión" (click)="logout()">
+            <mat-icon fontIcon="logout"></mat-icon>
+        </button>
+    </mat-toolbar>
+
+    <div class="container py-4 px-3">
+        <router-outlet></router-outlet>
+    </div>
+</mat-sidenav-container>
