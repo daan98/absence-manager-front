@@ -1,1 +1,36 @@
-<p>confirm-dialog works!</p>
+<h1
+  mat-dialog-title 
+  class="text-center"
+>
+  Eliminar falta
+</h1>
+
+<div mat-dialog-content>
+  Se eleiminara la falta de {{ data.user.name }} {{ data.user.lastName }} con fecha {{data.absenceDate}}. ¿Estas seguro?. Esta acción no se puede deshacer.
+</div>
+
+<div 
+  mat-dialog-actions 
+  class="flex flex-column sm:flex-row justify-content-center row-gap-3 pb-3 sm:column-gap-3 sm:row-gap-0"
+>
+  <button 
+    mat-raised-button 
+    mat-dialog-close 
+    cdkFocusInitial 
+    color="primary" 
+    class="w-full sm:w-fit" 
+    (click)="onClickCancel()"
+  >
+    Cancelar
+  </button>
+
+  <button 
+    mat-raised-button 
+    mat-dialog-close 
+    color="warn" 
+    class="w-full sm:w-fit" 
+    (click)="onClickConfirm()"
+  >
+    Confirmar
+  </button>
+</div>

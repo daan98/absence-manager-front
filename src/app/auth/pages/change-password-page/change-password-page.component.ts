@@ -37,14 +37,17 @@ export class ChangePasswordPageComponent {
     this.isLoading.set(true);
     const { dni, password, password2 } = this.myForm.value;
 
-    this.authService.getUserByDni(dni).subscribe({
+    this.authService.getAdminUserDni(dni, "administrador").subscribe({
       next: (response) => {
+        console.log('response: ', response);
         this.foundUser = response[0];
+        console.log('foundUser. ', this.foundUser);
 
         this.authService.changePassword(password, this.foundUser).subscribe({
           next: (response) => {
             this.isLoading.set(false);
-            this.router.navigateByUrl(AuthFrontUrlEnum.login);
+            console.log({response})
+            /* this.router.navigateByUrl(AuthFrontUrlEnum.login); */
           },
           error: (errorResponse) => {
             this.isLoading.set(false);

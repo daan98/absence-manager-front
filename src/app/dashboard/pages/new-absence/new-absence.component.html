@@ -1,1 +1,134 @@
-<p>new-absence works!</p>
+<h1 class="font-semibold">
+    {{isUpdating ? 'Editar' : 'Agregar'}} Falta
+</h1>
+
+<mat-divider></mat-divider>
+
+<div>
+    <mat-card>
+        <mat-card-content>
+            <form 
+                class="grid"
+                [formGroup]="absenceForm"
+                (ngSubmit)="isUpdating ? onUpdateAbsece() : onSubmitForm()"
+            >
+            <mat-form-field class="col-12">
+                <mat-label>Nombre</mat-label>
+                <input
+                    matInput
+                    type="text"
+                    placeholder="Escriba el nombre del profesor/estudiante"
+                    aria-label="Text"
+                    required
+                    [formControlName]="controlName.name"
+                    [matAutocomplete]="auto"
+                    (input)="onSearchUser()"
+                >
+                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                    @for (user of users; track user._id) {
+                        @if (user.role !== 'administrador') {
+                            <mat-option [value]="user" (onSelectionChange)="onSelectedUser($event)">
+                                {{ user.name }} {{ user.lastName }}
+                            </mat-option>
+                        }
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field class="col-12 pointer-events-none">
+                <mat-label>Apellido</mat-label>
+                <input
+                    matInput
+                    type="text"
+                    placeholder="Escriba el apellido del profesor/estudiante"
+                    aria-label="Text"
+                    required
+                    [formControlName]="controlName.lastName"
+                    [tabIndex]="-1"
+                >
+            </mat-form-field>
+
+            <div class="col-12">
+                <div class="col-12 flex flex-col">
+                    <mat-label class="font-bold">Justificación</mat-label>
+                    <mat-radio-group
+                        class="example-radio-group"
+                        [formControlName]="controlName.proof"
+                    >
+                    @for (proof of proofs; track proof) {
+                        <mat-radio-button
+                            [value]="proof"
+                            [checked]="selectedProof?.proof == proof.proof ? true : false"
+                            >
+                                {{ proof.proof }}
+                            </mat-radio-button>
+                    }
+                    </mat-radio-group>
+                </div>
+            </div>
+
+            <mat-form-field class="col-12">
+                <mat-label>Descripción de la justificación</mat-label>
+                <input
+                    matInput
+                    type="text"
+                    placeholder="Describa la justificación de su falta"
+                    aria-label="Text"
+                    [formControlName]="controlName.absenceDescription"
+                >
+            </mat-form-field>
+
+            <mat-form-field class="col-12">
+                <mat-label>Materia</mat-label>
+                    
+                <input
+                    matInput
+                    type="text"
+                    placeholder="Describa la justificación de su falta"
+                    aria-label="Text"
+                    [formControlName]="controlName.subject"
+                    [matAutocomplete]="autoSubject"
+                    (input)="onSearchSubject()"
+                >
+
+                <mat-autocomplete autoActiveFirstOption #autoSubject="matAutocomplete">
+                    @for (subject of subjects; track subject._id) {
+                        <mat-option [value]="subject" (onSelectionChange)="onSelectedSubject($event)">
+                            {{ subject.subjectName }}
+                        </mat-option>
+                    }
+                </mat-autocomplete>
+                    <!-- <mat-radio-group
+                    class="example-radio-group"
+                    [formControlName]="controlName.subject"
+                    >
+                    @for (subject of subjects; track subject._id) {
+                        <mat-radio-button [value]="subject">{{ subject.subjectName }}</mat-radio-button>
+                    }
+                    </mat-radio-group> -->
+            </mat-form-field>
+
+            <div class="col-12">
+                <h3 class="m-0">Fecha</h3>
+        
+                <mat-form-field>
+                    <mat-label class="font-bold">Escoja una fecha</mat-label>
+                    <div>
+                        <input matInput [matDatepicker]="picker" [formControlName]="controlName.date">
+                    </div>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker touchUi #picker></mat-datepicker>
+                </mat-form-field>
+                
+            </div>
+
+            <div>
+                <button mat-raised-button type="submit" color="accent">
+                    <mat-icon [fontIcon]="isUpdating ? 'edit' :'save'"></mat-icon>
+                    {{isUpdating ? 'Actualizar' : 'Guardar'}}
+                </button>
+            </div>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>

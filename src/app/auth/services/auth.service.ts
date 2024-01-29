@@ -71,11 +71,17 @@ export class AuthService {
     this._authStatus.set(AuthStatusEnum.notAuthenticated);
   }
 
-  public changePassword(newPassword : string, user : UserInterface) : Observable<UserInterface> {
-    return this.http.patch<UserInterface>(`${this.baseUrl}${AuthUrlEnum.user}/${user._id}`, newPassword);
+  public changePassword(password : string, user : UserInterface) : Observable<UserInterface> {
+    console.log({password});
+    console.log(user);
+    return this.http.patch<UserInterface>(`${this.baseUrl}${AuthUrlEnum.user}/${user._id}`, password);
   }
 
   public getUserByDni(dni : string) : Observable<UserInterface[]> {
     return this.http.get<UserInterface[]>(`${this.baseUrl}${AuthUrlEnum.dni}?dni=`);
+  }
+
+  public getAdminUserDni(dni : number, role : "administrador") : Observable<UserInterface[]> {
+    return this.http.get<UserInterface[]>(`${this.baseUrl}${AuthUrlEnum.dni}?dni=${dni}&role=${role}`);
   }
 }

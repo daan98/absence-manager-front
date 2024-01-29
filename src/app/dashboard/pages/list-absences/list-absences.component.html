@@ -1,50 +1,221 @@
-<table cdk-table class="w-full text-center" [dataSource]="dataSource" [cellSpacing]="0" fixedLayout><!--  -->
+<h1 class="font-semibold">Lista de faltas</h1>
+
+<table
+  cdk-table class="w-full text-center"
+  [dataSource]="dataSource"
+  [cellSpacing]="0"
+  fixedLayout
+>
     <!-- Position Column -->
-    <ng-container cdkColumnDef="position">
-      <th cdk-header-cell *cdkHeaderCellDef class="bg-primary text-white border-right-1 border-top-1 border-white"> No. </th>
-      <td cdk-cell *cdkCellDef="let element; let i = index, let e = even; let first = first" class="border-bottom-1 border-right-1 border-left-1" [ngClass]="{'bg-indigo-40': e, 'border-top-1': first }"> {{i + 1}} </td>
+    <ng-container
+      cdkColumnDef="position"
+    >
+      <th
+        cdk-header-cell
+        *cdkHeaderCellDef 
+        class="bg-primary text-white border-right-1 border-top-1 border-white w-3rem"
+      >
+        No.
+      </th>
+
+      <td 
+        cdk-cell 
+        *cdkCellDef="let element; let i = index, let e = even; let first = first"
+        class="border-bottom-1 border-right-1 border-left-1"
+        [ngClass]="{'bg-indigo-40': e, 'border-top-1': first }"
+      >
+        {{i + 1}}
+      </td>
     </ng-container>
   
     <!-- Columna de fecha -->
-    <ng-container cdkColumnDef="date">
-      <th cdk-header-cell *cdkHeaderCellDef class="bg-primary text-white border-right-1 border-top-1 border-white"> Fecha </th>
-      <td cdk-cell *cdkCellDef="let element; let e = even; let first = first" class="border-bottom-1 border-right-1" [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"> {{element.absenceDate}} </td>
+    <ng-container
+      cdkColumnDef="date"
+    >
+      <th 
+        cdk-header-cell
+        *cdkHeaderCellDef
+        class="bg-primary text-white border-right-1 border-top-1 border-white"
+      >
+        Fecha
+      </th>
+
+      <td
+        cdk-cell
+        *cdkCellDef="let element; let e = even; let first = first"
+        class="border-bottom-1 border-right-1"
+        [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"
+      >
+        {{element.absenceDate}}
+      </td>
     </ng-container>
   
     <!-- Columna de descripción -->
-    <ng-container cdkColumnDef="description">
-      <th cdk-header-cell *cdkHeaderCellDef class="bg-primary text-white border-right-1 border-top-1 border-white"> Descripción </th>
-      <td cdk-cell *cdkCellDef="let element; let e = even; let first = first" class="border-bottom-1 border-right-1" [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"> {{element.absenceDescription}} </td>
+    <ng-container
+      cdkColumnDef="description"
+    >
+      <th
+        cdk-header-cell
+        *cdkHeaderCellDef
+        class="bg-primary text-white border-right-1 border-top-1 border-white"
+      >
+        Descripción
+      </th>
+
+      <td 
+        cdk-cell
+        *cdkCellDef="let element; let e = even; let first = first"
+        class="border-bottom-1 border-right-1"
+        [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"
+      >
+        {{element.absenceDescription}}
+      </td>
     </ng-container>
   
     <!-- Columna de justificación -->
-    <ng-container cdkColumnDef="proof">
-      <th cdk-header-cell *cdkHeaderCellDef class="bg-primary text-white border-right-1 border-top-1 border-white"> Justificación </th>
-      <td cdk-cell *cdkCellDef="let element; let e = even; let first = first" class="border-bottom-1 border-right-1" [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"> {{element.proof.proof}} </td>
+    <ng-container
+      cdkColumnDef="proof"
+    >
+      <th
+        cdk-header-cell
+        *cdkHeaderCellDef
+        class="bg-primary text-white border-right-1 border-top-1 border-white"
+      >
+        Justificación
+      </th>
+
+      <td
+        cdk-cell
+        *cdkCellDef="let element; let e = even; let first = first"
+        class="border-bottom-1 border-right-1"
+        [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"
+      >
+        {{element.proof.proof}}
+      </td>
     </ng-container>
 
     <!-- Columna de materia -->
-    <ng-container cdkColumnDef="subject">
-        <th cdk-header-cell *cdkHeaderCellDef class="bg-primary text-white border-right-1 border-top-1 border-white"> Materia </th>
-        <td cdk-cell *cdkCellDef="let element; let e = even; let first = first" class="" class="border-bottom-1 border-right-1" [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"> {{element.subject.subjectName}} </td>
+    <ng-container
+      cdkColumnDef="subject"
+      >
+        <th
+          cdk-header-cell
+          *cdkHeaderCellDef
+          class="bg-primary text-white border-right-1 border-top-1 border-white"
+        >
+          Materia
+        </th>
+
+        <td
+          cdk-cell
+          *cdkCellDef="let element; let e = even; let first = first"
+          class="border-bottom-1 border-right-1"
+          [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"
+        >
+          {{element.subject.subjectName}}
+        </td>
     </ng-container>
 
     <!-- Columna del nombre de usuario -->
-    <ng-container cdkColumnDef="name">
-        <th cdk-header-cell *cdkHeaderCellDef class="bg-primary text-white border-right-1 border-top-1 border-white"> Nombre de la persona </th>
-        <td cdk-cell *cdkCellDef="let element; let e = even; let first = first" class="border-bottom-1 border-right-1" [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"> {{element.user.name}} {{ element.user.lastName }} </td>
+    <ng-container
+      cdkColumnDef="name"
+    >
+        <th 
+          cdk-header-cell
+          *cdkHeaderCellDef
+          class="bg-primary text-white border-right-1 border-top-1 border-white"
+        >
+        Nombre de la persona
+      </th>
+
+      <td 
+        cdk-cell
+        *cdkCellDef="let element; let e = even; let first = first"
+        class="border-bottom-1 border-right-1"
+        [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"
+      >
+        {{element.user.name}} {{ element.user.lastName }}
+      </td>
     </ng-container>
     
     <!-- Columna del rol del usuario -->
-    <ng-container cdkColumnDef="role">
-        <th cdk-header-cell *cdkHeaderCellDef class="bg-primary text-white border-right-1 border-top-1 border-white"> Rol </th>
-        <td cdk-cell *cdkCellDef="let element; let e = even; let first = first" class="border-bottom-1 border-right-1" [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"> {{element.user.role}} </td>
+    <ng-container
+      cdkColumnDef="role"
+    >
+      <th 
+        cdk-header-cell
+        *cdkHeaderCellDef
+        class="bg-primary text-white border-right-1 border-top-1 border-white"
+      >
+        Rol
+      </th>
+
+      <td
+        cdk-cell
+        *cdkCellDef="let element; let e = even; let first = first"
+        class="border-bottom-1 border-right-1"
+        [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"
+      >
+        {{element.user.role}}
+      </td>
     </ng-container>
     
     <!-- Columna del dni del usuario -->
-    <ng-container cdkColumnDef="dni">
-        <th cdk-header-cell *cdkHeaderCellDef class="bg-primary text-white border-right-1 border-top-1 border-white"> Identificaión </th>
-        <td cdk-cell *cdkCellDef="let element; let e = even; let first = first" class="border-right-1" class="border-bottom-1 border-right-1" [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"> {{element.user.dni}} </td>
+    <ng-container 
+      cdkColumnDef="dni"
+    >
+      <th
+        cdk-header-cell
+        *cdkHeaderCellDef
+        class="bg-primary text-white border-right-1 border-top-1 border-white"
+      >
+        Identificaión
+      </th>
+
+      <td
+        cdk-cell
+        *cdkCellDef="let element; let e = even; let first = first"
+        class="border-bottom-1 border-right-1"
+        [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"
+      >
+        {{element.user.dni}}
+      </td>
+    </ng-container>
+
+    <!-- Columna de acciones adicionales -->
+    <ng-container
+      cdkColumnDef="actions"
+    >
+      <th
+        cdk-header-cell
+        *cdkHeaderCellDef
+        class="bg-primary text-white border-right-1 border-top-1 border-white"
+      >
+        Acciones
+      </th>
+
+      <td
+        cdk-cell
+        *cdkCellDef="let element; let e = even; let first = first"
+        class="border-bottom-1 border-right-1 flex gap-2 p-2 justify-content-center"
+        [ngClass]="{'bg-indigo-40': e, 'border-top-1': first}"
+      >
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onEditAbsence(element)"
+        >
+          <mat-icon fontIcon="edit" class="m-0"></mat-icon>
+        </button>
+
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="onDeleteAbsence('500ms', '100ms', element)"
+        >
+          <mat-icon fontIcon="delete" class="m-0"></mat-icon>
+        </button>
+      </td>
     </ng-container>
   
     <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
