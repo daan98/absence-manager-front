@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, map, retry, throwError, of, Subscription } from 'rxjs';
-import { CheckTokenInterface, LoginResponseInterface, UserInterface } from '../interfaces';
+import { ChangePasswordInterface, CheckTokenInterface, LoginResponseInterface, UserInterface } from '../interfaces';
 import { environment } from '../../../environments/environments';
 import { AuthStatusEnum, AuthUrlEnum, LocalStorageItemEnum } from '../enum';
 import { LocalStorageService } from '../../local-storage.service';
@@ -71,10 +71,8 @@ export class AuthService {
     this._authStatus.set(AuthStatusEnum.notAuthenticated);
   }
 
-  public changePassword(password : string, user : UserInterface) : Observable<UserInterface> {
-    console.log({password});
-    console.log(user);
-    return this.http.patch<UserInterface>(`${this.baseUrl}${AuthUrlEnum.user}/${user._id}`, password);
+  public changePassword(password : ChangePasswordInterface, user : UserInterface) : Observable<UserInterface> {
+    return this.http.patch<UserInterface>(`${this.baseUrl}${AuthUrlEnum.changePassword}/${user._id}`, password.password);
   }
 
   public getUserByDni(dni : string) : Observable<UserInterface[]> {

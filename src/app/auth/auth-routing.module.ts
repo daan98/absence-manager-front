@@ -10,7 +10,7 @@ const routes: Routes = [
     component: AuthLayoutComponent,
     children: [
       { path: 'login', loadComponent: () => import("./pages/login-page/login-page.component").then(m => m.LoginPageComponent) },
-      { path: 'change-password', loadComponent: () => import("./pages/change-password-page/change-password-page.component").then(m => m.ChangePasswordPageComponent) },
+      // { path: 'change-password', loadComponent: () => import("./pages/change-password-page/change-password-page.component").then(m => m.ChangePasswordPageComponent) },
       { path: '**', redirectTo: 'login' }
     ]
   }

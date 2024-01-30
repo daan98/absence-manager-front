@@ -1,38 +1,49 @@
-import { CdkTableModule } from "@angular/cdk/table";
 import { CdkListbox, CdkOption } from '@angular/cdk/listbox';
+import { CdkTableModule } from "@angular/cdk/table";
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { filter, map, switchMap } from "rxjs";
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { provideNativeDateAdapter } from "@angular/material/core";
+import { Router } from '@angular/router';
 
 import { AbsenceExtraInfoInterface, ProofInterface, UserInterface } from '../../interfaces';
-import { DashboardService } from '../../services/dashboard.service';
-import { MaterialModule } from '../../../material/material.module';
 import { AppFrontUrlEnum } from "../../enum";
 import { ConfirmDialogComponent } from "../../components/confirm-dialog/confirm-dialog.component";
-import { provideNativeDateAdapter } from "@angular/material/core";
+import { DashboardService } from '../../services/dashboard.service';
+import { MaterialModule } from '../../../material/material.module';
+import { SharedModule } from "../../../shared/shared.module";
 
 @Component({
   selector: 'app-search-absence',
   standalone: true,
   providers: [ provideNativeDateAdapter() ],
-  imports: [ CdkTableModule, CdkListbox, CdkOption, CommonModule, MaterialModule, ReactiveFormsModule ],
+  imports: [
+    CdkListbox,
+    CdkOption,
+    CdkTableModule,
+    CommonModule,
+    MaterialModule,
+    ReactiveFormsModule,
+    SharedModule
+  ],
   templateUrl: './search-absence.component.html',
   styleUrls: [`./search-absence.component.scss`]
 })
 export class SearchAbsenceComponent implements OnInit {
-  private dashboardService          = inject( DashboardService );
-  private router                    = inject( Router );
-  private snackbar                  = inject( MatSnackBar );
-  private dialog                    = inject( MatDialog );
-  private year             : number = 0;
-  private month            : number = 0;
-  private day              : number = 0;
-  private formattedDate    : string = '';
+  private dashboardService                              = inject( DashboardService );
+  private router                                        = inject( Router );
+  private snackbar                                      = inject( MatSnackBar );
+  private dialog                                        = inject( MatDialog );
+  private year             : number                     = 0;
+  private month            : number                     = 0;
+  private day              : number                     = 0;
+  private formattedDate    : string                     = '';
 
+  public isLoading                                      = signal<boolean>(false);
+  public isButtonDesabled                               = signal<boolean>(true);
   public userControl      : FormControl                 = new FormControl('');
   public proofControl     : FormControl                 = new FormControl('');
   public users            : UserInterface[]             = [];
@@ -48,45 +59,52 @@ export class SearchAbsenceComponent implements OnInit {
   }
 
   public getAllProofs() : void {
+    this.isLoading.set(true);
+
     this.dashboardService.getProofs()
       .subscribe({
         next: (response : ProofInterface[]) => {
+          this.isLoading.set(false);
           this.proofs = response;
         },
         error: (err) => {
+          this.isLoading.set(false);
           this.showSnackbar('Hubo un error al obtener las justificaciones.');
         }
       });
-  }
-
-  public getProofSelected(proof : any) {
-    console.log('getProofSelected: ', proof);
   }
 
   public getRoleSelected(role : string) {
 
   }
 
-  public getResult() : void {
+  public onCloseCalendar() {
+    if (this.range.value.date !== null) {
+      this.isButtonDesabled.set(false);
+    }
+  }
 
-    console.log('getResult: ', this.range.value.date)
-    console.log('year: ', new Date(this.range.value.date).getFullYear());
-    console.log('month: ', new Date(this.range.value.date).getMonth() + 1);
-    console.log('day: ', new Date(this.range.value.date).getDate());
+  public getResult() : void {
+    this.isLoading.set(true);
+    
     this.year          = new Date(this.range.value.date).getFullYear();
     this.month         = new Date(this.range.value.date).getMonth() + 1;
     this.day           = new Date(this.range.value.date).getDate();
     this.formattedDate = `${this.year}-${this.addZero(this.month)}-${this.addZero(this.day)}`;
-    console.log('date formatted: ', this.formattedDate);
+    
     this.dashboardService.getAbsenceByDate(this.formattedDate)
       .subscribe({
         next: (absences : AbsenceExtraInfoInterface[]) => {
-          absences.forEach((absence, index) => {
-            absences[index].absenceDate = this.getDateFormatted(absence);
-          });
+          if (absences.length > 0) {
+            absences.forEach((absence, index) => {
+              absences[index].absenceDate = this.getDateFormatted(absence);
+            });
+          }
+          this.isLoading.set(false);
           this.dataSource = absences;
         },
         error: (err) => {
+          this.isLoading.set(false);
           this.dataSource = [];
           this.showSnackbar('Hubo un error al obtener las faltas.')
         }
@@ -141,6 +159,8 @@ export class SearchAbsenceComponent implements OnInit {
   }
 
   public onDeleteAbsence(enterAnimationDuration : string, exitAnimationDuration : string, absence : AbsenceExtraInfoInterface) : void {
+    this.isLoading.set(true);
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       enterAnimationDuration,
       exitAnimationDuration,
@@ -156,9 +176,11 @@ export class SearchAbsenceComponent implements OnInit {
       )
       .subscribe({
         next: (response) => {
+          this.isLoading.set(false);
           window.location.reload();
         },
         error: (err) => {
+          this.isLoading.set(false);
           this.showSnackbar('Hubo un error al eliminar la falta.');
         }
       });

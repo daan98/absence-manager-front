@@ -1,8 +1,139 @@
 <h1 class="font-semibold">Lista de faltas</h1>
 
+<!-- @if (dataSource.length > 0) { -->
+  <form
+    class="flex justify-content-center flex-wrap"
+    [formGroup]="absenceForm"
+  >
+    <mat-form-field class="col-3 align-items-center">
+      <mat-label>Nombre</mat-label>
+      <input
+          matInput
+          type="text"
+          placeholder="Escriba el nombre del profesor/estudiante"
+          aria-label="Text"
+          required
+          [formControlName]="controlName.name"
+          [matAutocomplete]="auto"
+          (input)="onSearchUser()"
+      >
+      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+          @for (user of users; track user._id) {
+              @if (user.role !== 'administrador') {
+                  <mat-option [value]="user" (onSelectionChange)="onSelectedUser($event)">
+                      {{ user.name }} {{ user.lastName }}
+                  </mat-option>
+              }
+          }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <mat-form-field class="col-3 pointer-events-none">
+      <mat-label>Apellido</mat-label>
+      <input
+          matInput
+          type="text"
+          placeholder="Escriba el apellido del profesor/estudiante"
+          aria-label="Text"
+          required
+          [formControlName]="controlName.lastName"
+          [tabIndex]="-1"
+      >
+    </mat-form-field>
+
+    <div class="col-3 align-items-center">
+      <h3 class="m-0">Fecha</h3>
+
+      <mat-form-field class="w-full">
+          <mat-label>Escoja una fecha dando click al icono</mat-label>
+          <div>
+              <input matInput [matDatepicker]="picker" formControlName="date" (input)="onSelectDate()">
+          </div>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker touchUi #picker (closed)="onSelectDate()"></mat-datepicker>
+      </mat-form-field>
+    </div>
+  
+    <div class="col-3 align-items-center">
+          <mat-label class="font-bold flex justify-content-center">Justificación</mat-label>
+          <mat-radio-group
+              class="example-radio-group"
+              [formControlName]="controlName.proof"
+          >
+          @for (proof of proofs; track proof) {
+              <mat-radio-button
+                  [value]="proof"
+                  [checked]="selectedProof?.proof == proof.proof ? true : false"
+                  >
+                      {{ proof.proof }}
+                  </mat-radio-button>
+          }
+          </mat-radio-group>
+    </div>
+
+    <div class="col-2 align-items-center">
+      <mat-label class="font-bold flex justify-content-center">Rol</mat-label>
+      <mat-radio-group
+          class="example-radio-group"
+          formControlName="role"
+      >
+      @for (role of roles; track role) {
+          <mat-radio-button
+              [value]="role"
+              >
+                  {{ role }}
+              </mat-radio-button>
+      }
+      </mat-radio-group>
+    </div>
+  
+    <mat-form-field class="col-3 align-items-center">
+      <mat-label>Materia</mat-label>
+          
+      <input
+          matInput
+          type="text"
+          placeholder="Escriba el nombre de la materia"
+          aria-label="Text"
+          [formControlName]="controlName.subject"
+          [matAutocomplete]="autoSubject"
+          (input)="onSearchSubject()"
+      >
+  
+      <mat-autocomplete autoActiveFirstOption #autoSubject="matAutocomplete">
+          @for (subject of subjects; track subject._id) {
+              <mat-option [value]="subject" (onSelectionChange)="onSelectedSubject($event)">
+                  {{ subject.subjectName }}
+              </mat-option>
+          }
+      </mat-autocomplete>
+          <!-- <mat-radio-group
+          class="example-radio-group"
+          [formControlName]="controlName.subject"
+          >
+          @for (subject of subjects; track subject._id) {
+              <mat-radio-button [value]="subject">{{ subject.subjectName }}</mat-radio-button>
+          }
+          </mat-radio-group> -->
+    </mat-form-field>
+
+    <div class="flex col-3 justify-content-center gap-4 flex-col">
+      <button mat-raised-button type="button" color="accent" (click)="onApplyFilter()">
+          <mat-icon fontIcon="filter_list"></mat-icon>
+          Filtrar
+      </button>
+
+      <button mat-raised-button type="button" color="warn" (click)="deleteFilters()">
+        <mat-icon fontIcon="refresh"></mat-icon>
+        Eliminar filtro
+      </button>
+    </div>
+  </form>
+<!-- } -->
+
 <table
   cdk-table class="w-full text-center"
-  [dataSource]="dataSource"
+  [dataSource]="filteredDataSource.length > 0 ? filteredDataSource : dataSource"
   [cellSpacing]="0"
   fixedLayout
 >
@@ -221,4 +352,8 @@
     <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
     <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+
+@if (isLoading()) {
+  <shared-loading-wheel />
+}
   

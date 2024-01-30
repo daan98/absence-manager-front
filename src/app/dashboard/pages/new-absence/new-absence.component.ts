@@ -1,23 +1,32 @@
-import { Component, Inject, OnInit, inject } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DashboardService } from '../../services/dashboard.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MaterialModule } from '../../../material/material.module';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { CdkListbox, CdkOption } from '@angular/cdk/listbox';
+import { CommonModule } from '@angular/common';
+import { Component, Inject, OnInit, inject, signal } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatOptionSelectionChange, provideNativeDateAdapter } from '@angular/material/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { switchMap } from 'rxjs';
+
 import { AbsenceExtraInfoInterface, AbsenceInterface, CreateAbsenceInterface, ProofInterface, SubjectInterface, UserInterface } from '../../interfaces';
 import { AppFrontUrlEnum, CreateAbsenceFormControlEnum } from '../../enum';
-import { switchMap } from 'rxjs';
-import { CommonModule } from '@angular/common';
-import { MatOptionSelectionChange, provideNativeDateAdapter } from '@angular/material/core';
-import { response } from 'express';
-import { CdkListbox, CdkOption } from '@angular/cdk/listbox';
+import { DashboardService } from '../../services/dashboard.service';
+import { MaterialModule } from '../../../material/material.module';
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-new-absence',
   standalone: true,
   providers: [ provideNativeDateAdapter() ],
-  imports: [ ReactiveFormsModule, MaterialModule, CommonModule, FormsModule, CdkListbox, CdkOption ],
+  imports: [ 
+    CdkListbox,
+    CdkOption,
+    CommonModule,
+    FormsModule,
+    MaterialModule,
+    ReactiveFormsModule,
+    SharedModule
+  ],
   templateUrl: './new-absence.component.html',
   styles: ``
 })
@@ -28,7 +37,8 @@ export class NewAbsenceComponent implements OnInit {
   private router                                       = inject(Router);
   private snackbar                                     = inject(MatSnackBar);
   private dialog                                       = inject(MatDialog);
-
+  
+  public isLoading                                     = signal<boolean>(false);
   public year                : number                  = 0;
   public month               : number                  = 0;
   public day                 : number                  = 0;
@@ -58,7 +68,6 @@ export class NewAbsenceComponent implements OnInit {
   ngOnInit(): void {
     this.getProofs();
     if(this.router.url.includes('editar')) {
-      console.log('editando');
       this.isUpdating = true;
       this.getCurrentAbsenceInformation();
     }
@@ -70,13 +79,16 @@ export class NewAbsenceComponent implements OnInit {
   }
 
   public getProofs() : void {
+    this.isLoading.set(true);
     this.dashboardService.getProofs()
       .subscribe({
         next: (response) => {
           this.proofs = response;
+          this.isLoading.set(false);
         },
         error: (err) => {
           this.proofs = [];
+          this.isLoading.set(false);
         }
       })
   }
@@ -90,7 +102,6 @@ export class NewAbsenceComponent implements OnInit {
           }
 
           this.subjects = response;
-          console.log('subjects: ', this.subjects);
         },
         error: (err) => {
           this.subjects = [];
@@ -99,11 +110,13 @@ export class NewAbsenceComponent implements OnInit {
   }
 
   public onSubmitForm() : void {
+    this.isLoading.set(true);
     if (this.absenceForm.invalid) {
       const fieldValueArray : [] = Object.values(this.absenceForm.value) as [];
       const fieldTitleArray : [] = Object.keys(this.absenceForm.value) as [];
       const emptyFieldFound = this.checkEmptyField(fieldValueArray, fieldTitleArray);
 
+      this.isLoading.set(false);
       this.showSnackBar(emptyFieldFound.message, 2500);
       return;
     }
@@ -116,6 +129,7 @@ export class NewAbsenceComponent implements OnInit {
 
     // Checking if proof is "other"
     if(this.absenceForm.value[this.controlName.proof].proof === "otro" && !this.absenceForm.value[this.controlName.absenceDescription]) {
+      this.isLoading.set(false);
       this.showSnackBar('Por favor especifique la razón de su falta.', 2500);
       return;
     }
@@ -127,14 +141,16 @@ export class NewAbsenceComponent implements OnInit {
       subject: this.currentAbsence.subject._id,
       user: this.currentAbsence.user._id,
     };
-    console.log('createAbsenceBody: ', this.createAbsenceBody);
+
     this.dashboardService.createAbsence(this.createAbsenceBody)
       .subscribe({
         next: (newAbsence) => {
+          this.isLoading.set(false);
           this.router.navigate([AppFrontUrlEnum.editAbsence, newAbsence._id]);
           this.showSnackBar('Falta creada exitosamente.', 2500);
         },
         error: (err) => {
+          this.isLoading.set(false);
           this.showSnackBar('Hubo un erorr al crear la falta.', 2500);
         }
       })
@@ -145,11 +161,13 @@ export class NewAbsenceComponent implements OnInit {
   -- no tener una función con tantas lineas de código
   */
   public onUpdateAbsece() : void {
+    this.isLoading.set(true);
     if (this.absenceForm.invalid) {
       const fieldValueArray : [] = Object.values(this.absenceForm.value) as [];
       const fieldTitleArray : [] = Object.keys(this.absenceForm.value) as [];
       const emptyFieldFound = this.checkEmptyField(fieldValueArray, fieldTitleArray);
 
+      this.isLoading.set(false);
       this.showSnackBar(emptyFieldFound.message, 2500);
       return;
     }
@@ -165,7 +183,6 @@ export class NewAbsenceComponent implements OnInit {
       // Obteniendo el ID del usuario para actualizar
       if(!this.absenceForm.value[this.controlName.name]._id) {
         // Obtener el id del usuario
-        console.log('userDni: ', this.userDni);
         this.dashboardService.getUserByDni(this.userDni)
           .subscribe({
             next: (foundUser : UserInterface[]) => {
@@ -180,6 +197,7 @@ export class NewAbsenceComponent implements OnInit {
 
                   // Checking if proof is "other"
                   if(this.absenceForm.value[this.controlName.proof].proof === "otro" && !this.absenceForm.value[this.controlName.absenceDescription]) {
+                    this.isLoading.set(false);
                     this.showSnackBar('Por favor especifique la razón de su falta.', 2500);
                     return;
                   }
@@ -192,30 +210,31 @@ export class NewAbsenceComponent implements OnInit {
                     subject: foundSubject[0]?._id,
                     user: foundUser[0]?._id,
                   };
-                  console.log(foundUser);
-
-                  console.log('createAbsenceBody: ', this.createAbsenceBody);
+                  
                   // Actualizando información de falta
                   this.dashboardService.updateAbsece(this.createAbsenceBody, this.absenceForm.value[this.controlName.id])
                     .subscribe({
                       next: (updatedAbsence) => {
-                        console.log('updatedAbsence: ', updatedAbsence);
+                        this.isLoading.set(false);
                         this.router.navigateByUrl('/');
                         this.showSnackBar('Falta actualizada correctamente.', 2500);
                       },
                       error: (err) => {
+                        this.isLoading.set(false);
                         this.showSnackBar(err.message, 2500);
                       }
                     }
                   );
                 },
                 error: (err) => {
+                  this.isLoading.set(false);
                   this.showSnackBar('Hubo un error al buscar la información de la materia', 2500);
                 }
               });
               // COPIANDO AQUI (FIN)
             },
             error: (err) => {
+              this.isLoading.set(false);
               this.showSnackBar('Hubo un error al buscar la información del usuario.', 2500);
             }
           });
@@ -230,6 +249,7 @@ export class NewAbsenceComponent implements OnInit {
 
             // Revisando que campo justificación sea "otro"
             if(this.absenceForm.value[this.controlName.proof].proof === "otro" && !this.absenceForm.value[this.controlName.absenceDescription]) {
+              this.isLoading.set(false);
               this.showSnackBar('Por favor especifique la razón de su falta.', 2500);
               return;
             }
@@ -244,17 +264,16 @@ export class NewAbsenceComponent implements OnInit {
               user: this.currentAbsence.user?._id,
             };
 
-            console.log('createAbsenceBody: ', this.createAbsenceBody);
-
             // Actualizando información de falta
             this.dashboardService.updateAbsece(this.createAbsenceBody, this.absenceForm.value[this.controlName.id])
               .subscribe({
                 next: (updatedAbsence) => {
-                  console.log('updatedAbsence: ', updatedAbsence);
+                  this.isLoading.set(false);
                   this.router.navigateByUrl('/');
                   this.showSnackBar('Falta actualizada correctamente.', 2500);
                 },
                 error: (err) => {
+                  this.isLoading.set(false);
                   this.showSnackBar(err.message, 2500);
                 }
               }
@@ -262,20 +281,22 @@ export class NewAbsenceComponent implements OnInit {
             return;
           },
           error: (err) => {
+            this.isLoading.set(false);
             this.showSnackBar('Hubo un error al buscar la información de la materia', 2500);
           }
         });
   }
 
   public getCurrentAbsenceInformation() {
+    this.isLoading.set(true);
     this.activateRoute.params
       .pipe(
         switchMap(({ id }) => this.dashboardService.getAbsence(id))
       )
       .subscribe({
         next: (response : AbsenceExtraInfoInterface) => {
-          console.log('current absence response: ', response);
           if(!response) {
+            this.isLoading.set(false);
             this.router.navigateByUrl('/');
             this.showSnackBar('No se encontro información de la falta.', 2500);
             return;
@@ -293,32 +314,23 @@ export class NewAbsenceComponent implements OnInit {
           this.absenceForm.get(this.controlName.absenceDescription)?.setValue(absenceDescription);
           this.absenceForm.get(this.controlName.subject)?.setValue(subject.subjectName);
           this.absenceForm.get(this.controlName.date)?.setValue(absenceDate);
-          console.log('absenceForm in get current info: ', this.absenceForm.value);
+          this.isLoading.set(false);
+
         },
         error: (err) => {
+          this.isLoading.set(false);
           this.router.navigateByUrl('/');
           this.showSnackBar('Hubo un error al obtener información de la falta.', 3000);
         }
       });
   }
 
-  /* public onSelectProof(selectProof : any) {
-    console.log('onSelectProof: ', selectProof);
-    // this.selectedProof = selectProof;
-  } */
-
   public onSearchUser() {
-    console.log('onSearchUser: ', this.absenceForm.value);
     const { [this.controlName.name]:name } = this.absenceForm.value;
-    console.log('nombre:', name);
+
     this.dashboardService.getSuggestedUser(name, 3)
       .subscribe({
         next: (response : UserInterface[]) => {
-          /* if(response.length === 0) {
-            this.users = [];
-            return
-          } */
-          console.log('response: ', response);
           this.users = response;
         },
         error: (err) => {
@@ -347,7 +359,6 @@ export class NewAbsenceComponent implements OnInit {
     this.absenceForm.get(this.controlName.lastName)?.setValue(user.lastName);
     this.userFilteredOption = user;
     this.users = [user];
-    console.log(user); 
   }
 
   public onSelectedSubject(event : MatOptionSelectionChange) : void {
@@ -372,10 +383,8 @@ export class NewAbsenceComponent implements OnInit {
       if(!field && fieldsTitle[index] !== 'descripcion' && fieldsTitle[index] !== 'id') {
         emptyFieldAmount += 1;
         emptyFieldTitle = fieldsTitle[index];
-        console.log('title: ', fieldsTitle[index]);
       }
     });
-    console.log('emptyFieldAmount: ', emptyFieldAmount);
     return {
       amount: emptyFieldAmount,
       message: emptyFieldAmount === 0 ? `El campo ${emptyFieldTitle.replaceAll('_', '')} esta vacio` : 'Hay campos vacios.',

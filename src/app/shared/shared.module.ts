@@ -8,6 +8,7 @@ import { LoadingWheelComponent } from './loading-wheel/loading-wheel.component';
   declarations: [],
   imports: [
     LoadingWheelComponent
-  ]
+  ],
+  exports: [ LoadingWheelComponent ]
 })
 export class SharedModule { }

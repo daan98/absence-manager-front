@@ -1,49 +1,6 @@
 <h1 class="font-semibold">Buscar faltas</h1>
 
 <div class="flex flex-row justify-content-center gap-4">
-    <!-- <div>
-        <h3 class="m-0">Usuario</h3>
-
-        <mat-form-field>
-            <input
-                type="text"
-                placeholder="Escribe el nombre del usuario"
-                aria-label="Text"
-                matInput
-                [formControl]="userControl"
-                (input)="onSearchAbsence()"
-            >
-        </mat-form-field>
-    </div> -->
-
-    <!-- <div>
-        <h3 class="m-0">Justificación</h3>
-
-        <ul cdkListbox
-            cdkListboxOrientation="horizontal"
-            aria-labelledby="example-shirt-size-label"
-            class="example-listbox"
-        >
-            @for (proof of proofs; track proof.proof) {
-                <li [cdkOption]="proof.proof" class="example-option" (click)="getProofSelected(proof.proof)">{{proof.proof}}</li>
-            }
-        </ul>
-    </div> -->
-
-    <!-- <div>
-        <h3 class="m-0">Rol</h3>
-
-        <ul cdkListbox
-            cdkListboxOrientation="horizontal"
-            aria-labelledby="example-shirt-size-label"
-            class="example-listbox"
-        >
-            @for (role of roles; track role) {
-                <li [cdkOption]="role" class="example-option" style="padding: 17px;" (click)="getRoleSelected(role)">{{role}}</li>
-            }
-        </ul>
-    </div> -->
-
     <div>
         <h3 class="m-0">Fecha</h3>
 
@@ -53,7 +10,7 @@
                 <input matInput [matDatepicker]="picker" formControlName="date">
             </div>
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker touchUi #picker></mat-datepicker>
+            <mat-datepicker touchUi #picker (closed)="onCloseCalendar()"></mat-datepicker>
         </mat-form-field>
     </div>
 
@@ -62,6 +19,7 @@
         color="primary"
         class="align-self-center"
         (click)="getResult();"
+        [disabled]="isButtonDesabled()"
     >
         <mat-icon fontIcon="search" class="m-0"></mat-icon>
     </button>
@@ -69,9 +27,15 @@
 
 <h3 *ngIf="dataSource.length  == 0" class="text-bluegray-100 text-center">Realice una búsqueda</h3>
 
+@if (isLoading()) {
+  <div>
+    <shared-loading-wheel/>
+  </div>
+}
+
 <table
   cdk-table class="w-full text-center"
-  [dataSource]="dataSource"
+  [dataSource]="dataSource.length > 0 ? dataSource : []"
   [cellSpacing]="0"
   fixedLayout
   *ngIf="dataSource.length != 0"

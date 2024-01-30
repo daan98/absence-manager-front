@@ -84,7 +84,7 @@
                 <input
                     matInput
                     type="text"
-                    placeholder="Describa la justificación de su falta"
+                    placeholder="Escriba el nombre de la materia"
                     aria-label="Text"
                     [formControlName]="controlName.subject"
                     [matAutocomplete]="autoSubject"
@@ -131,4 +131,8 @@
             </form>
         </mat-card-content>
     </mat-card>
+
+    @if (isLoading()) {
+        <shared-loading-wheel/>
+    }
 </div>

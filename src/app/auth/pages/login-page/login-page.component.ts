@@ -4,16 +4,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 
-import { AuthService } from '../../services/auth.service';
 import { AuthFrontUrlEnum } from '../../enum';
+import { AuthService } from '../../services/auth.service';
 import { SharedModule } from '../../../shared/shared.module';
-import { LoadingWheelComponent } from '../../../shared/loading-wheel/loading-wheel.component';
-import { response } from 'express';
 
 @Component({
   selector: 'auth-login-page',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, RouterModule, LoadingWheelComponent ],
+  imports: [ CommonModule, ReactiveFormsModule, RouterModule, SharedModule ],
   templateUrl: './login-page.component.html',
   styles: ``
 })
@@ -39,7 +37,6 @@ export class LoginPageComponent {
         this.router.navigateByUrl('dashboard');
       },
       error: (errorMessage) => {
-        console.log({errorMessage});
         this.isLoading.set(false);
         Swal.fire({
           title: "Error",

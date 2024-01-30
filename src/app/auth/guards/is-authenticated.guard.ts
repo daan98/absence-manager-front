@@ -10,18 +10,14 @@ export const isAuthenticatedGuard: CanActivateFn = (route, state) => {
   const router              = inject( Router );
   const localStorageService = inject( LocalStorageService );
   const url                 = state.url;
-  console.log('url: ', url);
 
   localStorage.setItem(LocalStorageItemEnum.url, url);
 
-  console.log('authStatus is authenticated: ', authService.authStatus());
   if(authService.authStatus() === AuthStatusEnum.authenticated) {
-    console.log('first');
     return true;
   }
 
   router.navigateByUrl( AuthFrontUrlEnum.login );
-  console.log('second');
   return false;
 };
 

@@ -1,18 +1,24 @@
-import { Component, inject, signal } from '@angular/core';
-import { LoadingWheelComponent } from '../../../shared/loading-wheel/loading-wheel.component';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ValidatorService } from '../../services/validator.service';
-import { AuthService } from '../../services/auth.service';
-import { Router, RouterModule } from '@angular/router';
 import { AuthFrontUrlEnum } from '../../enum';
-import Swal from 'sweetalert2';
-import { UserInterface } from '../../interfaces';
+import { AuthService } from '../../services/auth.service';
+import { ChangePasswordInterface, UserInterface } from '../../interfaces';
+import { SharedModule } from '../../../shared/shared.module';
+import { ValidatorService } from '../../services/validator.service';
+
 import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-change-password-page',
   standalone: true,
-  imports: [CommonModule, LoadingWheelComponent, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    SharedModule,
+    ReactiveFormsModule,
+    RouterModule
+  ],
   templateUrl: './change-password-page.component.html',
   styles: ``
 })
@@ -33,28 +39,34 @@ export class ChangePasswordPageComponent {
   });
   public foundUser : UserInterface | null = null;
 
-  public changePassword() {
+  public async  changePassword() {
     this.isLoading.set(true);
     const { dni, password, password2 } = this.myForm.value;
 
-    this.authService.getAdminUserDni(dni, "administrador").subscribe({
-      next: (response) => {
-        console.log('response: ', response);
-        this.foundUser = response[0];
-        console.log('foundUser. ', this.foundUser);
+    const newPassword : ChangePasswordInterface = { password };
 
-        this.authService.changePassword(password, this.foundUser).subscribe({
+    if ( newPassword.password.length < 8) {
+      Swal.fire({
+        title: "Error",
+        text: 'La contraseña debe ser menor o igual a 8 carácteres.',
+        icon: "error"
+      })
+    }
+
+    await this.authService.getAdminUserDni(dni, "administrador").subscribe({
+      next: (response) => {
+        this.foundUser = response[0];
+        
+        this.authService.changePassword(newPassword, this.foundUser).subscribe({
           next: (response) => {
             this.isLoading.set(false);
-            console.log({response})
-            /* this.router.navigateByUrl(AuthFrontUrlEnum.login); */
+            this.router.navigateByUrl(AuthFrontUrlEnum.login);
           },
           error: (errorResponse) => {
             this.isLoading.set(false);
-            console.log({errorResponse});
             Swal.fire({
               title: "Error",
-              text: errorResponse,
+              text: 'Error al actualizar la contraseña',
               icon: "error"
             })
           }
@@ -63,10 +75,9 @@ export class ChangePasswordPageComponent {
       },
       error: (errorResponse) => {
         this.isLoading.set(false);
-        console.log({errorResponse});
         Swal.fire({
           title: "Error",
-          text: errorResponse,
+          text: 'Error al actualizar la contraseña',
           icon: "error"
         });
       }
