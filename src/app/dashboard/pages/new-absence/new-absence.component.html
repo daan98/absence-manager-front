@@ -89,23 +89,16 @@
                     [formControlName]="controlName.subject"
                     [matAutocomplete]="autoSubject"
                     (input)="onSearchSubject()"
+                    class="capitalize"
                 >
 
                 <mat-autocomplete autoActiveFirstOption #autoSubject="matAutocomplete">
                     @for (subject of subjects; track subject._id) {
-                        <mat-option [value]="subject" (onSelectionChange)="onSelectedSubject($event)">
+                        <mat-option [value]="subject" (onSelectionChange)="onSelectedSubject($event)" class="capitalize">
                             {{ subject.subjectName }}
                         </mat-option>
                     }
                 </mat-autocomplete>
-                    <!-- <mat-radio-group
-                    class="example-radio-group"
-                    [formControlName]="controlName.subject"
-                    >
-                    @for (subject of subjects; track subject._id) {
-                        <mat-radio-button [value]="subject">{{ subject.subjectName }}</mat-radio-button>
-                    }
-                    </mat-radio-group> -->
             </mat-form-field>
 
             <div class="col-12">
@@ -114,19 +107,26 @@
                 <mat-form-field>
                     <mat-label class="font-bold">Escoja una fecha</mat-label>
                     <div>
-                        <input matInput [matDatepicker]="picker" [formControlName]="controlName.date">
+                        <input class="pointer-events-none" matInput [matDatepicker]="picker" [formControlName]="controlName.date" >
                     </div>
-                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker touchUi #picker></mat-datepicker>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker" [disabled]="false"></mat-datepicker-toggle>
+                    <mat-datepicker touchUi #picker [disabled]="false"></mat-datepicker>
                 </mat-form-field>
                 
             </div>
 
-            <div>
+            <div class="flex gap-3">
                 <button mat-raised-button type="submit" color="accent">
                     <mat-icon [fontIcon]="isUpdating ? 'edit' :'save'"></mat-icon>
                     {{isUpdating ? 'Actualizar' : 'Guardar'}}
                 </button>
+
+                @if (isUpdating) {
+                    <button mat-raised-button type="button" color="primary" (click)="goBack()">
+                        <mat-icon fontIcon="arrow_back_ios"></mat-icon>
+                        Volver a inicio
+                    </button>
+                }
             </div>
             </form>
         </mat-card-content>

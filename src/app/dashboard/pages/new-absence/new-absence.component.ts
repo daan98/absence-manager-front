@@ -94,7 +94,7 @@ export class NewAbsenceComponent implements OnInit {
   }
 
   public onSearchSubject() : void {
-    this.dashboardService.getSubjectByName(this.absenceForm.value[this.controlName.subject], 6)
+    this.dashboardService.getSubjectByName(this.absenceForm.value[this.controlName.subject], 0)
       .subscribe({
         next: (response : SubjectInterface[]) => {
           if(response.length === 0) {
@@ -173,12 +173,10 @@ export class NewAbsenceComponent implements OnInit {
     }
 
     // Actualizar la falta
-      // ¿HACE FALTA? (INICIO)
       this.year                                     = new Date(this.absenceForm.value[this.controlName.date]).getFullYear();
       this.month                                    = new Date(this.absenceForm.value[this.controlName.date]).getMonth() + 1;
       this.day                                      = new Date(this.absenceForm.value[this.controlName.date]).getDate();
       this.absenceForm.value[this.controlName.date] = `${this.year}-${this.addZero(this.month)}-${this.addZero(this.day)}`;
-      // ¿HACE FALTA? (FIN)
 
       // Obteniendo el ID del usuario para actualizar
       if(!this.absenceForm.value[this.controlName.name]._id) {
@@ -188,9 +186,8 @@ export class NewAbsenceComponent implements OnInit {
             next: (foundUser : UserInterface[]) => {
               this.absenceForm.get(this.controlName.name)?.setValue(foundUser[0]);
 
-              //COPIANDO AQUI (INICIO)
               // Obteniendo el id de la materia para actualizar
-              this.dashboardService.getSubjectByName(this.absenceForm.value[this.controlName.subject], 1)
+              this.dashboardService.getSubjectByName(this.absenceForm.value[this.controlName.subject].subjectName, 1)
               .subscribe({
                 next: (foundSubject : SubjectInterface[]) => {
                   this.absenceForm.value[this.controlName.subject] = foundSubject[0]
@@ -231,7 +228,6 @@ export class NewAbsenceComponent implements OnInit {
                   this.showSnackBar('Hubo un error al buscar la información de la materia', 2500);
                 }
               });
-              // COPIANDO AQUI (FIN)
             },
             error: (err) => {
               this.isLoading.set(false);
@@ -303,7 +299,9 @@ export class NewAbsenceComponent implements OnInit {
           }
 
           const { _id, absenceDate, absenceDescription, proof, subject, user } = response;
+          const newDate = new Date(absenceDate);
           
+          newDate.setDate(newDate.getDate() + 1);
           this.selectedProof = proof;
           this.userDni       = user.dni;
 
@@ -313,7 +311,7 @@ export class NewAbsenceComponent implements OnInit {
           this.absenceForm.get(this.controlName.proof)?.setValue(proof);
           this.absenceForm.get(this.controlName.absenceDescription)?.setValue(absenceDescription);
           this.absenceForm.get(this.controlName.subject)?.setValue(subject.subjectName);
-          this.absenceForm.get(this.controlName.date)?.setValue(absenceDate);
+          this.absenceForm.get(this.controlName.date)?.setValue(newDate);
           this.isLoading.set(false);
 
         },
@@ -328,7 +326,7 @@ export class NewAbsenceComponent implements OnInit {
   public onSearchUser() {
     const { [this.controlName.name]:name } = this.absenceForm.value;
 
-    this.dashboardService.getSuggestedUser(name, 3)
+    this.dashboardService.getSuggestedUser(name, 0)
       .subscribe({
         next: (response : UserInterface[]) => {
           this.users = response;

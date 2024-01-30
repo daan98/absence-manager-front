@@ -1,7 +1,7 @@
 import { CdkListbox, CdkOption } from "@angular/cdk/listbox";
 import { CdkTableModule } from "@angular/cdk/table";
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { filter, map, retry, switchMap } from 'rxjs';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from '@angular/material/dialog';
@@ -34,6 +34,8 @@ import { SharedModule } from "../../../shared/shared.module";
   styles: ``
 })
 export class ListAbsencesComponent implements OnInit {
+  @ViewChild('radioRole') radioRole : any;
+
   private dashboardService = inject( DashboardService );
   private router           = inject( Router );
   private snackbar         = inject( MatSnackBar );
@@ -53,6 +55,7 @@ export class ListAbsencesComponent implements OnInit {
   public proofs             : ProofInterface[]        = [];
   public selectedProof     ?: ProofInterface;
   public subjects           : SubjectInterface[]      = [];
+  public selectedRole      ?: string;
   public roles              : string[]                = ['profesor', 'estudiante'];
   public absenceForm        : FormGroup               = new FormGroup(
     {
@@ -67,7 +70,6 @@ export class ListAbsencesComponent implements OnInit {
       role: new FormControl<string>(''),
     }
   );
-  /* public range            : FormGroup                   = new FormGroup({ date: new FormControl<Date | null>(null) }); */
 
   constructor() { }
   
@@ -141,11 +143,23 @@ export class ListAbsencesComponent implements OnInit {
   public deleteFilters() {
     this.filteredDataSource = [];
     this.formattedDate = '';
-    this.absenceForm.reset();
     this.users = [];
     this.proofs = [];
     this.subjects = [];
+    this.selectedRole = '';
     this.roles = [];
+    this.absenceForm.get(this.controlName.name)?.setValue('');
+    this.absenceForm.get(this.controlName.lastName)?.setValue('');
+    this.absenceForm.get(this.controlName.subject)?.setValue('');
+    this.absenceForm.get(this.controlName.proof)?.setValue('');
+    this.absenceForm.get('role')?.setValue('');
+
+    this.absenceForm.get(this.controlName.name)?.setErrors(null);
+    this.absenceForm.get(this.controlName.lastName)?.setErrors(null);
+    this.absenceForm.get(this.controlName.subject)?.setErrors(null);
+    this.absenceForm.get(this.controlName.proof)?.setErrors(null);
+    this.absenceForm.get('role')?.setErrors(null);
+
     this.roles = ['profesor', 'estudiante'];
     this.getProofs();
   }
@@ -167,7 +181,7 @@ export class ListAbsencesComponent implements OnInit {
 
   public onSearchUser() {
     const { [this.controlName.name]:name } = this.absenceForm.value;
-    this.dashboardService.getSuggestedUser(name, 3)
+    this.dashboardService.getSuggestedUser(name, 0)
       .subscribe({
         next: (response : UserInterface[]) => {
           this.users = response;
@@ -208,8 +222,12 @@ export class ListAbsencesComponent implements OnInit {
     this.users = [user]
   }
 
+  public onSelectRole(actualRole : string) {
+    this.selectedRole = actualRole;
+  }
+
   public onSearchSubject() : void {
-    this.dashboardService.getSubjectByName(this.absenceForm.value[this.controlName.subject], 6)
+    this.dashboardService.getSubjectByName(this.absenceForm.value[this.controlName.subject], 0)
       .subscribe({
         next: (response : SubjectInterface[]) => {
           if(response.length === 0) {
@@ -429,9 +447,9 @@ export class ListAbsencesComponent implements OnInit {
       ) {
         if (
           this.absenceForm.value[this.controlName.subject]?.subjectName === data.subject?.subjectName &&
-          this.absenceForm.value[this.controlName.name].name === data.user.name &&
-          this.absenceForm.value[this.controlName.name].lastName === data.user.lastName &&
-          this.absenceForm.value[this.controlName.proof].proof === data.proof.proof
+          this.absenceForm.value[this.controlName.name]?.name === data.user?.name &&
+          this.absenceForm.value[this.controlName.name]?.lastName === data.user?.lastName &&
+          this.absenceForm.value[this.controlName.proof]?.proof === data.proof?.proof
         ) {
           this.filteredDataSource.push(data);
         }

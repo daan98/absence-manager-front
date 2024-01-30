@@ -41,7 +41,7 @@
       >
     </mat-form-field>
 
-    <div class="col-3 align-items-center">
+    <div class="col-3 align-items-center hidden">
       <h3 class="m-0">Fecha</h3>
 
       <mat-form-field class="w-full">
@@ -74,12 +74,15 @@
     <div class="col-2 align-items-center">
       <mat-label class="font-bold flex justify-content-center">Rol</mat-label>
       <mat-radio-group
+          #radioRole
           class="example-radio-group"
           formControlName="role"
       >
       @for (role of roles; track role) {
           <mat-radio-button
               [value]="role"
+              (change)="onSelectRole(role)"
+              [checked]="selectedRole == role ? true : false"
               >
                   {{ role }}
               </mat-radio-button>
@@ -98,23 +101,16 @@
           [formControlName]="controlName.subject"
           [matAutocomplete]="autoSubject"
           (input)="onSearchSubject()"
+          class="capitalize"
       >
   
       <mat-autocomplete autoActiveFirstOption #autoSubject="matAutocomplete">
           @for (subject of subjects; track subject._id) {
-              <mat-option [value]="subject" (onSelectionChange)="onSelectedSubject($event)">
+              <mat-option [value]="subject" (onSelectionChange)="onSelectedSubject($event)" class="capitalize">
                   {{ subject.subjectName }}
               </mat-option>
           }
       </mat-autocomplete>
-          <!-- <mat-radio-group
-          class="example-radio-group"
-          [formControlName]="controlName.subject"
-          >
-          @for (subject of subjects; track subject._id) {
-              <mat-radio-button [value]="subject">{{ subject.subjectName }}</mat-radio-button>
-          }
-          </mat-radio-group> -->
     </mat-form-field>
 
     <div class="flex col-3 justify-content-center gap-4 flex-col">
