@@ -125,6 +125,7 @@ export class ListAbsencesComponent implements OnInit {
           this.showSnackbar('Error al eliminar la falta');
         }
       });
+      this.isLoading.set(false);
   }
 
   public getDateFormatted(absence : AbsenceExtraInfoInterface) : string {

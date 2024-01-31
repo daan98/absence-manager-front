@@ -184,6 +184,7 @@ export class SearchAbsenceComponent implements OnInit {
           this.showSnackbar('Hubo un error al eliminar la falta.');
         }
       });
+      this.isLoading.set(false);
   }
 
   public getDateFormatted(absence : AbsenceExtraInfoInterface) : string {
