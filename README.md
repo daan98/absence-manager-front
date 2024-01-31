@@ -1,27 +1,24 @@
-# AbsenceManager
+# Administrador de faltas
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.8.
+Proyecto generado con [Angular CLI](https://github.com/angular/angular-cli) versi+on 17.0.8.
 
-## Development server
+## ANTES DE CORRER CUALQIER COMANDO
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Escribe `npm install` o `npm i` para intalar todos los recursos necesarios para la parte visual de la aplicación.
 
-## Code scaffolding
+## Servidor de desarrollo
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Corre el comando `ng serve` o `npm run dev` para poder ver la aplicación de manera local. Navega a `http://localhost:4200/` Para visualizar la página.
 
-## Build
+## Para poder usar la aplicación y ver la información
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Necesitas tener corriendo la base de datos del proyecto, por favor ve a mi repositorio [absence-manager-db](https://github.com/daan98/absence-manager-db) y revisa el archivo README.md.
 
-## Running unit tests
+## Más ayuda
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Para obtener mas ayuda referente a Angular CLI escribe `ng help` o revisa la siguiente página [Angular CLI Overview and Command Reference](https://angular.io/cli)
 
-## Running end-to-end tests
+## NOTA 
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Todos los comandos deben correrse en la consola una vez que estes ubicado en la carpeta del proyecto.
+- Las faltas se pueden crear, visualizar y actualizar al correr este proyecto.
